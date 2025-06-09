@@ -21,11 +21,11 @@ HEADERS = {
 VECTOR_DB_DIR = "vector_store"
 
 def clean_text(text: str) -> str:
-    """Clean and normalize text extracted from HTML."""
+    # Clean and normalize text extracted from HTML.
     return ' '.join(text.split())
 
 def fetch_page_text(url: str) -> str:
-    """Fetch and parse HTML from a given URL, returning clean visible text."""
+    # Fetch and parse HTML from a given URL, returning clean visible text.
     try:
         print(f"[INFO] Fetching: {url}")
         response = requests.get(url, headers=HEADERS, timeout=10)
@@ -43,7 +43,7 @@ def fetch_page_text(url: str) -> str:
     return ""
 
 def load_documents(urls: list[str]) -> list[Document]:
-    """Load content from a list of URLs and return as Document objects."""
+    # Load content from a list of URLs and return as Document objects.
     documents = []
     for url in urls:
         text = fetch_page_text(url)
@@ -52,7 +52,7 @@ def load_documents(urls: list[str]) -> list[Document]:
     return documents
 
 def store_in_vector_db(docs: list[Document], save_path: str):
-    """Embed documents and store them in a FAISS vector DB."""
+    # Embed documents and store them in a FAISS vector DB.
     print("[INFO] Embedding and saving documents to vector DB...")
 
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
