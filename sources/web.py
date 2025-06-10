@@ -9,9 +9,7 @@ import os
 
 # URLs to scrape
 URLS = [
-    "https://cynayd.com/",
-    "https://cynayd.com/service-web",
-    "https://cynayd.com/why-us"
+    "https://www.viit.ac.in/"
 ]
 
 HEADERS = {
