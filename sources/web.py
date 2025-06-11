@@ -7,11 +7,12 @@ from langchain_huggingface import HuggingFaceEmbeddings
 import os
 from collections import deque
 from urllib.parse import urljoin, urlparse
+from langchain_text_splitters import HTMLHeaderTextSplitter
 
 load_dotenv()
 
-#  URL for the crawl
-BASE_URL = "https://www.viit.ac.in/"
+# url
+BASE_URL = "https://www.lattice.site/"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
@@ -20,15 +21,21 @@ HEADERS = {
 VECTOR_DB_DIR = "vector_store"
 
 def clean_text(text: str) -> str:
-    # Clean and normalize
     return ' '.join(text.split())
 
 def crawl_website(start_url: str) -> list[Document]:
-    # Crawl a website 
     documents = []
     urls_to_visit = deque([start_url])
     visited_urls = set()
     base_domain = urlparse(start_url).netloc
+
+    headers_to_split_on = [
+        ("h1", "Header 1"),
+        ("h2", "Header 2"),
+        ("h3", "Header 3"),
+        ("h4", "Header 4"),
+    ]
+    html_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
 
     print(f"[INFO] Starting crawl on domain: {base_domain}")
 
@@ -44,17 +51,16 @@ def crawl_website(start_url: str) -> list[Document]:
         try:
             response = requests.get(current_url, headers=HEADERS, timeout=10)
             response.raise_for_status()
+            
+            html_chunks = html_splitter.split_text(response.text)
+            
+            for chunk in html_chunks:
+                chunk.page_content = clean_text(chunk.page_content)
+                chunk.metadata["source"] = current_url
+            
+            documents.extend(html_chunks)
+
             soup = BeautifulSoup(response.text, "html.parser")
-
-            # Extract and clean text for the document
-            for element in soup(["script", "style", "noscript", "header", "footer"]):
-                element.extract()
-            text = clean_text(soup.get_text())
-
-            if text:
-                documents.append(Document(page_content=text, metadata={"source": current_url}))
-
-            # Find all internal links on the page and add them to the queue
             for a_tag in soup.find_all("a", href=True):
                 link = a_tag['href']
                 full_url = urljoin(current_url, link)
@@ -75,7 +81,7 @@ def store_in_vector_db(docs: list[Document], save_path: str):
         print("[WARNING] No documents to store. Skipping vector DB creation.")
         return
         
-    print("[INFO] Embedding and saving documents to vector DB...")
+    print(f"[INFO] Embedding and saving {len(docs)} document chunks to vector DB...")
 
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
@@ -86,7 +92,7 @@ def store_in_vector_db(docs: list[Document], save_path: str):
 
 if __name__ == "__main__":
     docs = crawl_website(BASE_URL)
-    print(f"[INFO] Crawled and loaded {len(docs)} documents.")
+    print(f"[INFO] Crawled and chunked site into {len(docs)} documents.")
 
     if docs:
         store_in_vector_db(docs, VECTOR_DB_DIR)
