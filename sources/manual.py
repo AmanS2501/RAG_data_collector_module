@@ -75,7 +75,7 @@ def load_documents(manual_inputs: List[dict]) -> List[Document]:
     return documents
 
 def store_in_vector_db(docs: List[Document], save_path: str):
-    """Embed documents and store them in a FAISS vector DB."""
+    # Embed documents and store them in a FAISS vector DB.
     print("[INFO] Embedding and saving documents to vector DB...")
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     vectorstore = FAISS.from_documents(docs, embeddings)
@@ -83,7 +83,7 @@ def store_in_vector_db(docs: List[Document], save_path: str):
     print(f"[SUCCESS] Vector store saved to: {save_path}")
 
 def add_manual_entry(title: str, content: str, category: str = "General") -> dict:
-    """Helper function to create a manual entry."""
+    # Helper function to create a manual entry.
     return {
         "title": title,
         "content": content,
