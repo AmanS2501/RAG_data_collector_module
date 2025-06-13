@@ -1,0 +1,9 @@
+[
+  {
+    "type": "json_save",
+    "filename": "test_documents.json",
+    "document_count": 1,
+    "saved_at": "2025-06-13T15:03:42.040133",
+    "file_path": "storage\\test_documents.json"
+  }
+]
