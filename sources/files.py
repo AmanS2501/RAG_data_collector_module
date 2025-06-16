@@ -1,3 +1,5 @@
+# sources/files.py
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -9,7 +11,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 import PyPDF2
 from typing import List
 
-FILE_PATHS = [
+# Default file paths if not imported from config
+DEFAULT_FILE_PATHS = [
     "documents/sample.pdf"
     # "documents/manual.txt",
     # "documents/guide.pdf"
@@ -18,9 +21,11 @@ FILE_PATHS = [
 VECTOR_DB_DIR = "vector_store"
 
 def clean_text(text: str) -> str:
+    """Clean text by removing extra whitespace"""
     return ' '.join(text.split())
 
 def read_pdf_file(file_path: str) -> str:
+    """Read text content from PDF file"""
     try:
         print(f"[INFO] Reading PDF: {file_path}")
         text = ""
@@ -36,6 +41,7 @@ def read_pdf_file(file_path: str) -> str:
         return ""
 
 def read_text_file(file_path: str) -> str:
+    """Read text content from text file"""
     try:
         print(f"[INFO] Reading text file: {file_path}")
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -46,6 +52,7 @@ def read_text_file(file_path: str) -> str:
         return ""
 
 def fetch_file_content(file_path: str) -> str:
+    """Fetch content from file based on file extension"""
     if not os.path.exists(file_path):
         print(f"[ERROR] File not found: {file_path}")
         return ""
@@ -60,7 +67,11 @@ def fetch_file_content(file_path: str) -> str:
         print(f"[ERROR] Unsupported file type: {file_extension}")
         return ""
 
-def load_documents(file_paths: List[str]) -> List[Document]:
+def load_documents(file_paths: List[str] = None) -> List[Document]:
+    """Load documents from file paths"""
+    if file_paths is None:
+        file_paths = DEFAULT_FILE_PATHS
+    
     documents = []
     for file_path in file_paths:
         text = fetch_file_content(file_path)
@@ -71,7 +82,12 @@ def load_documents(file_paths: List[str]) -> List[Document]:
             ))
     return documents
 
-def store_in_vector_db(docs: List[Document], save_path: str):
+def store_in_vector_db(docs: List[Document], save_path: str = VECTOR_DB_DIR):
+    """Store documents in vector database"""
+    if not docs:
+        print("[WARNING] No documents to store. Skipping vector DB creation.")
+        return
+        
     print("[INFO] Embedding and saving documents to vector DB...")
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     vectorstore = FAISS.from_documents(docs, embeddings)
@@ -79,7 +95,7 @@ def store_in_vector_db(docs: List[Document], save_path: str):
     print(f"[SUCCESS] Vector store saved to: {save_path}")
 
 if __name__ == "__main__":
-    docs = load_documents(FILE_PATHS)
+    docs = load_documents(DEFAULT_FILE_PATHS)
     print(f"[INFO] Loaded {len(docs)} documents.")
     
     if docs:
