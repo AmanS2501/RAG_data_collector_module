@@ -12,7 +12,7 @@ from langchain_text_splitters import HTMLHeaderTextSplitter
 load_dotenv()
 
 # url
-BASE_URL = "https://www.lattice.site/"
+BASE_URL = input("Enter the base URL to crawl (e.g., https://example.com): ").strip()
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
