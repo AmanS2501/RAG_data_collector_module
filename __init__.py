@@ -1,12 +1,5 @@
-# __init__.py for RAG data collector module
-
-"""
-RAG Data Collector Module
-A package for collecting, processing, and storing documents for RAG systems.
-"""
-
 __version__ = "0.1.0"
-__author__ = "Your Name"
+__author__ = "Aman Shaikh"
 
 import sys
 import os

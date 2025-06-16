@@ -1,10 +1,3 @@
-# utils/__init__.py
-
-"""
-Utils package for RAG Data Collector Module
-Contains utility modules for chunking and cleaning text data
-"""
-
 __version__ = "0.1.0"
 
 # Import modules

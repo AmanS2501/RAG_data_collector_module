@@ -1,11 +1,3 @@
-# __main__.py
-
-"""
-Main entry point for RAG Data Collector Module
-This file allows the package to be executed directly with:
-python -m RAG_data_collector_module
-"""
-
 import sys
 import os
 from pathlib import Path
