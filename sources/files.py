@@ -11,7 +11,7 @@ from typing import List
 
 # Default file paths if not imported from config
 DEFAULT_FILE_PATHS = [
-    "/documents/sample.pdf"
+    "documents/sample.pdf"
     # "documents/manual.txt",
     # "documents/guide.pdf"
 ]

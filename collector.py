@@ -9,6 +9,7 @@ from langchain_core.documents import Document
 from typing import List
 
 
+
 def collect_file_documents() -> List[Document]:
     try:
         raw_docs = load_file_documents(FILE_PATHS)

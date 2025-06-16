@@ -21,7 +21,7 @@ def initialize_modules():
         print(f"⚠ Could not import config module: {e}")
 
     try:
-        import RAG_data_collector_module.storage as storage
+        import RAG_data_collector_module.storage_utils as storage
         available_modules.append("storage")
         print("✓ Storage module loaded")
     except ImportError as e:
