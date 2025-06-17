@@ -8,6 +8,8 @@ import os
 from collections import deque
 from urllib.parse import urljoin, urlparse
 from langchain_text_splitters import HTMLHeaderTextSplitter
+from RAG_data_collector_module.storage_utils import DocumentStorage
+
 
 load_dotenv()
 
@@ -20,6 +22,8 @@ HEADERS = {
 
 VECTOR_DB_DIR = "vector_store"
 
+
+
 def clean_text(text: str) -> str:
     return ' '.join(text.split())
 
@@ -28,6 +32,8 @@ def crawl_website(start_url: str) -> list[Document]:
     urls_to_visit = deque([start_url])
     visited_urls = set()
     base_domain = urlparse(start_url).netloc
+    storage = DocumentStorage()
+
 
     headers_to_split_on = [
         ("h1", "Header 1"),
@@ -58,7 +64,21 @@ def crawl_website(start_url: str) -> list[Document]:
                 chunk.page_content = clean_text(chunk.page_content)
                 chunk.metadata["source"] = current_url
             
-            documents.extend(html_chunks)
+            if html_chunks:
+                print(f"[INFO] Saving {len(html_chunks)} chunks from {current_url}")
+
+                try:
+                    storage.save_documents_as_json(
+                        documents=html_chunks,
+                        filename="partial_documents.json",
+                        append=True
+                    )
+
+                except Exception as e:
+                    print(f"[ERROR] Could not save partial data for {current_url}: {e}")
+
+                documents.extend(html_chunks)
+
 
             soup = BeautifulSoup(response.text, "html.parser")
             for a_tag in soup.find_all("a", href=True):
@@ -66,8 +86,18 @@ def crawl_website(start_url: str) -> list[Document]:
                 full_url = urljoin(current_url, link)
                 parsed_url = urlparse(full_url)
 
+                # Force HTTPS scheme
+                if parsed_url.scheme == "http":
+                    print(f"[INFO] Forcing HTTPS for: {full_url}")
+
+                if parsed_url.scheme == "http":
+                    parsed_url = parsed_url._replace(scheme="https")
+                    full_url = parsed_url.geturl()
+
                 if (parsed_url.scheme in ["http", "https"]) and (parsed_url.netloc == base_domain) and (full_url not in visited_urls):
                     urls_to_visit.append(full_url)
+
+
 
         except requests.RequestException as e:
             print(f"[ERROR] Request failed for {current_url}: {e}")

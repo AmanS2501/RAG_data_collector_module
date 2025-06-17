@@ -30,25 +30,36 @@ class DocumentStorage:
         self.vector_db_dir.mkdir(parents=True, exist_ok=True)
         print(f"[INFO] Storage directories ensured: {self.storage_dir}, {self.vector_db_dir}")
     
-    def save_documents_as_json(self, documents: List[Document], filename: str = "documents.json") -> bool:
+    def save_documents_as_json(self, documents: List[Document], filename: str = "documents.json", append: bool = False) -> bool:
         # Save documents as JSON file.
         try:
             file_path = self.storage_dir / filename
             
-            # Convert documents to serializable format
-            doc_data = []
-            for doc in documents:
-                doc_dict = {
+            new_doc_data = [
+                {
                     "page_content": doc.page_content,
                     "metadata": doc.metadata,
                     "saved_at": datetime.now().isoformat()
-                }
-                doc_data.append(doc_dict)
+                } for doc in documents
+            ]
             
+            if append and file_path.exists():
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        existing_data = json.load(f)
+                except Exception as e:
+                    print(f"[WARNING] Could not read existing JSON. Overwriting. Reason: {e}")
+                    existing_data = []
+            else:
+                existing_data = []
+            
+            # Combine existing + new
+            all_data = existing_data + new_doc_data
+
             # Save to JSON
             with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(doc_data, f, indent=2, ensure_ascii=False)
-            
+               json.dump(all_data, f, indent=2, ensure_ascii=False)
+
             print(f"[SUCCESS] Saved {len(documents)} documents to: {file_path}")
             
             # Update metadata

@@ -9,7 +9,6 @@ from langchain_core.documents import Document
 from typing import List
 
 
-
 def collect_file_documents() -> List[Document]:
     try:
         raw_docs = load_file_documents(FILE_PATHS)
@@ -46,9 +45,22 @@ def collect_manual_documents() -> List[Document]:
         return []
 
 
+def safe_crawl_website(url: str) -> List[Document]:
+    try:
+        # Force HTTPS if HTTP is used
+        if url.startswith("http://"):
+            url = url.replace("http://", "https://")
+
+        # Inject updated URL into crawl_website
+        return crawl_website(url)
+    except Exception as e:
+        print(f"[ERROR] Failed to crawl website: {e}")
+        return []
+
+
 def collect_web_documents() -> List[Document]:
     try:
-        raw_docs = crawl_website(BASE_URL)
+        raw_docs = safe_crawl_website(BASE_URL)
         cleaned_docs = []
         for doc in raw_docs:
             cleaned_text_content = clean_text(doc.page_content)
