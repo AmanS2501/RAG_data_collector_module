@@ -56,28 +56,6 @@ def main():
     
     print("\n[INFO] RAG Data Collector execution completed!")
 
-def show_help():
-    """Show help information"""
-    help_text = """
-RAG Data Collector Module
-========================
-
-Usage:
-    python -m RAG_data_collector_module [options]
-
-Options:
-    --help, -h          Show this help message
-    --collect-only      Only collect documents, don't store them
-    --no-chunk          Don't chunk the documents
-    --stats             Show storage statistics only
-    --clean             Clean up old storage files
-
-Examples:
-    python -m RAG_data_collector_module
-    python -m RAG_data_collector_module --stats
-    python -m RAG_data_collector_module --collect-only
-    """
-    print(help_text)
 
 def show_stats():
     """Show storage statistics"""
