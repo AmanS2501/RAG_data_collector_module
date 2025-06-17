@@ -27,13 +27,14 @@ VECTOR_DB_DIR = "vector_store"
 def clean_text(text: str) -> str:
     return ' '.join(text.split())
 
-def crawl_website(start_url: str) -> list[Document]:
+def crawl_website(start_url: str, max_pages: int = 100) -> list[Document]:
+    from time import sleep
+
     documents = []
     urls_to_visit = deque([start_url])
     visited_urls = set()
     base_domain = urlparse(start_url).netloc
     storage = DocumentStorage()
-
 
     headers_to_split_on = [
         ("h1", "Header 1"),
@@ -45,8 +46,11 @@ def crawl_website(start_url: str) -> list[Document]:
 
     print(f"[INFO] Starting crawl on domain: {base_domain}")
 
-    while urls_to_visit:
+    while urls_to_visit and len(visited_urls) < max_pages:
         current_url = urls_to_visit.popleft()
+
+        # Remove fragment identifiers
+        current_url = current_url.split("#")[0]
 
         if current_url in visited_urls:
             continue
@@ -57,13 +61,13 @@ def crawl_website(start_url: str) -> list[Document]:
         try:
             response = requests.get(current_url, headers=HEADERS, timeout=10)
             response.raise_for_status()
-            
+
             html_chunks = html_splitter.split_text(response.text)
-            
+
             for chunk in html_chunks:
                 chunk.page_content = clean_text(chunk.page_content)
                 chunk.metadata["source"] = current_url
-            
+
             if html_chunks:
                 print(f"[INFO] Saving {len(html_chunks)} chunks from {current_url}")
 
@@ -73,31 +77,33 @@ def crawl_website(start_url: str) -> list[Document]:
                         filename="partial_documents.json",
                         append=True
                     )
-
                 except Exception as e:
                     print(f"[ERROR] Could not save partial data for {current_url}: {e}")
 
                 documents.extend(html_chunks)
 
-
+            # Discover internal links
             soup = BeautifulSoup(response.text, "html.parser")
             for a_tag in soup.find_all("a", href=True):
                 link = a_tag['href']
                 full_url = urljoin(current_url, link)
+                full_url = full_url.split("#")[0]  # 🔧 Remove fragment identifiers
+
                 parsed_url = urlparse(full_url)
 
-                # Force HTTPS scheme
+                # Force HTTPS if needed
                 if parsed_url.scheme == "http":
                     print(f"[INFO] Forcing HTTPS for: {full_url}")
-
-                if parsed_url.scheme == "http":
                     parsed_url = parsed_url._replace(scheme="https")
                     full_url = parsed_url.geturl()
 
-                if (parsed_url.scheme in ["http", "https"]) and (parsed_url.netloc == base_domain) and (full_url not in visited_urls):
+                if (parsed_url.scheme in ["http", "https"]) and \
+                   (parsed_url.netloc == base_domain) and \
+                   (full_url not in visited_urls):
                     urls_to_visit.append(full_url)
 
-
+            # Optional delay between requests (avoid being blocked)
+            sleep(0.5)
 
         except requests.RequestException as e:
             print(f"[ERROR] Request failed for {current_url}: {e}")
@@ -105,6 +111,7 @@ def crawl_website(start_url: str) -> list[Document]:
             print(f"[ERROR] Failed to process {current_url}: {e}")
 
     return documents
+
 
 def store_in_vector_db(docs: list[Document], save_path: str):
     if not docs:
