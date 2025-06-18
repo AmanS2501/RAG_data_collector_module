@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ✅ Import from source modules using absolute paths
-from RAG_data_collector_module.sources.files import DEFAULT_FILE_PATHS
-from RAG_data_collector_module.sources.manual import MANUAL_INPUTS
-from RAG_data_collector_module.sources.web import BASE_URL
+from RAG_data_collector_module.sources import DEFAULT_FILE_PATHS
+from RAG_data_collector_module.sources import MANUAL_INPUTS
+from RAG_data_collector_module.sources import BASE_URL
 
 # ✅ Export them clearly
 FILE_PATHS = DEFAULT_FILE_PATHS

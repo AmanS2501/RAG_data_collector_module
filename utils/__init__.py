@@ -11,8 +11,7 @@ try:
         chunk_text_by_size,
         chunk_by_sentences,
         chunk_by_words,
-        chunk_by_paragraphs,
-        smart_chunking
+        chunk_by_paragraphs
     )
     from .cleaner import (
         clean_text,
@@ -34,7 +33,6 @@ try:
         "chunk_by_sentences",
         "chunk_by_words",
         "chunk_by_paragraphs",
-        "smart_chunking",
         "clean_text",
         "remove_html_tags",
         "normalize_whitespace",

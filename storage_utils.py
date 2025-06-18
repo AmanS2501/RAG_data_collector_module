@@ -162,7 +162,7 @@ class DocumentStorage:
             })
             
             return True
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to store in vector DB: {e}")
             return False
@@ -267,7 +267,7 @@ class DocumentStorage:
         except Exception as e:
             print(f"[ERROR] Failed to get storage stats: {e}")
             return {}
-    
+
     def cleanup_old_files(self, days_old: int = 30) -> bool:
         # Clean up files older than specified days.
         try:
@@ -313,26 +313,26 @@ def load_stored_documents(source: str = "json") -> List[Document]:
         print("[ERROR] Only JSON loading is supported for documents")
         return []
 
-if __name__ == "__main__":
-    # Example usage
-    storage = DocumentStorage()
+# if __name__ == "__main__":
+#     # Example usage
+#     storage = DocumentStorage()
     
-    # Print storage statistics
-    stats = storage.get_storage_stats()
-    print(f"[INFO] Storage Statistics:")
-    for key, value in stats.items():
-        print(f"  {key}: {value}")
+#     # Print storage statistics
+#     stats = storage.get_storage_stats()
+#     print(f"[INFO] Storage Statistics:")
+#     for key, value in stats.items():
+#         print(f"  {key}: {value}")
     
-    # Test with sample documents
-    sample_docs = [
-        Document(
-            page_content="This is a test document.",
-            metadata={"source": "test", "type": "sample"}
-        )
-    ]
+#     # Test with sample documents
+#     sample_docs = [
+#         Document(
+#             page_content="This is a test document.",
+#             metadata={"source": "test", "type": "sample"}
+#         )
+#     ]
     
-    # Test storage operations
-    print("\n[INFO] Testing storage operations...")
-    storage.save_documents_as_json(sample_docs, "test_documents.json")
-    loaded_docs = storage.load_documents_from_json("test_documents.json")
-    print(f"[INFO] Loaded {len(loaded_docs)} documents from JSON")
+#     # Test storage operations
+#     print("\n[INFO] Testing storage operations...")
+#     storage.save_documents_as_json(sample_docs, "test_documents.json")
+#     loaded_docs = storage.load_documents_from_json("test_documents.json")
+#     print(f"[INFO] Loaded {len(loaded_docs)} documents from JSON")

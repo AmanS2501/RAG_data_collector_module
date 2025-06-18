@@ -1,8 +1,8 @@
-from RAG_data_collector_module.sources.files import load_documents as load_file_documents
-from RAG_data_collector_module.sources.manual import load_documents as load_manual_documents
-from RAG_data_collector_module.sources.web import crawl_website
-from RAG_data_collector_module.utils.cleaner import clean_text
-from RAG_data_collector_module.utils.chunker import chunk_document
+from RAG_data_collector_module.sources import load_file_documents
+from RAG_data_collector_module.sources import load_manual_documents
+from RAG_data_collector_module.sources import crawl_website
+from RAG_data_collector_module.utils import clean_text
+from RAG_data_collector_module.utils import chunk_document
 from RAG_data_collector_module.config import FILE_PATHS, MANUAL_INPUTS, BASE_URL, DEFAULT_CHUNK_SIZE, DEFAULT_OVERLAP
 
 from langchain_core.documents import Document
@@ -105,7 +105,7 @@ def collect_all_documents(chunk: bool = True) -> List[Document]:
         print(f"[INFO] Total documents before chunking: {len(all_docs)}")
 
         if chunk and all_docs:
-            all_docs = chunk_documents(all_docs)
+            all_docs = chunk_documents(all_docs, )
             print(f"[INFO] Total documents after chunking: {len(all_docs)}")
 
         return all_docs
@@ -114,7 +114,7 @@ def collect_all_documents(chunk: bool = True) -> List[Document]:
         return []
 
 
-if __name__ == "__main__":
-    print("[INFO] Running collector directly...")
-    collected_docs = collect_all_documents(chunk=True)
-    print(f"[INFO] Collected total {len(collected_docs)} documents after cleaning and chunking.")
+# if __name__ == "__main__":
+#     print("[INFO] Running collector directly...")
+#     collected_docs = collect_all_documents(chunk=True)
+#     print(f"[INFO] Collected total {len(collected_docs)} documents after cleaning and chunking.") This runs only when the script is executed directly

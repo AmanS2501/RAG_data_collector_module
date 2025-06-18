@@ -58,40 +58,40 @@ def list_modules():
     return available_modules
 
 # Safe proxy functions
-def load_file_documents(*args, **kwargs):
-    try:
-        return sources.load_file_documents(*args, **kwargs)
-    except:
-        print("Sources module not available")
-        return []
+# def load_file_documents(*args, **kwargs):
+#     try:
+#         return sources.load_file_documents(*args, **kwargs)
+#     except:
+#         print("Sources module not available")
+#         return []
 
-def chunk_document(*args, **kwargs):
-    try:
-        return utils.chunk_document(*args, **kwargs)
-    except:
-        print("Utils module not available")
-        return []
+# def chunk_document(*args, **kwargs):
+#     try:
+#         return utils.chunk_document(*args, **kwargs)
+#     except:
+#         print("Utils module not available")
+#         return []
 
-def clean_text(*args, **kwargs):
-    try:
-        return utils.clean_text(*args, **kwargs)
-    except:
-        print("Utils module not available")
-        return ""
+# def clean_text(*args, **kwargs):
+#     try:
+#         return utils.clean_text(*args, **kwargs)
+#     except:
+#         print("Utils module not available")
+#         return ""
 
-def collect_all_documents(*args, **kwargs):
-    try:
-        return collector.collect_all_documents(*args, **kwargs)
-    except:
-        print("Collector module not available")
-        return []
+# def collect_all_documents(*args, **kwargs):
+#     try:
+#         return collector.collect_all_documents(*args, **kwargs)
+#     except:
+#         print("Collector module not available")
+#         return []
 
-def store_documents(*args, **kwargs):
-    try:
-        return storage.store_documents(*args, **kwargs)
-    except:
-        print("Storage module not available")
-        return False
+# def store_documents(*args, **kwargs):
+#     try:
+#         return storage.store_documents(*args, **kwargs)
+#     except:
+#         print("Storage module not available")
+#         return False
 
 __all__ = [
     "hello", "list_modules", "load_file_documents", "chunk_document",
@@ -102,11 +102,11 @@ __all__ = [
 print(f"RAG Data Collector Module v{__version__} initialized successfully!")
 print(f"Available modules: {', '.join(available_modules) if available_modules else 'None'}")
 
-if __name__ == "__main__":
-    print("="*50)
-    print("RAG DATA COLLECTOR MODULE")
-    print("="*50)
-    print(f"Version: {__version__}")
-    print(f"Available modules: {len(available_modules)}")
+# if __name__ == "__main__":
+#     print("="*50)
+#     print("RAG DATA COLLECTOR MODULE")
+#     print("="*50)
+#     print(f"Version: {__version__}")
+#     print(f"Available modules: {len(available_modules)}")
 
-    print(f"\nTest function result: {hello()}")
+#     print(f"\nTest function result: {hello()}") #runs only if executed directly

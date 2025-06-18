@@ -9,7 +9,9 @@ try:
     # Make key functions available at package level
     from .files import load_documents as load_file_documents, fetch_file_content
     from .manual import load_documents as load_manual_documents, add_manual_entry
-    from .web import crawl_website
+    from .web import crawl_website, BASE_URL, HEADERS
+    from .manual import MANUAL_INPUTS
+    from .files import DEFAULT_FILE_PATHS
     
     __all__ = [
         "files",

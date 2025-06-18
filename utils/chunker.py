@@ -167,26 +167,26 @@ def chunk_document(document: Document, chunk_size: int = 1000, overlap: int = 20
     
     return chunked_docs
 
-def smart_chunking(text: str, max_chunk_size: int = 1000, min_chunk_size: int = 100) -> List[str]:
-    # Intelligent chunking that tries paragraphs first, then sentences, then words.
-    if not text:
-        return []
+# def smart_chunking(text: str, max_chunk_size: int = 1000, min_chunk_size: int = 100) -> List[str]:
+#     # Intelligent chunking that tries paragraphs first, then sentences, then words.
+#     if not text:
+#         return []
     
-    # First try paragraph-based chunking
-    paragraph_chunks = chunk_by_paragraphs(text, max_chunk_size)
+#     # First try paragraph-based chunking
+#     paragraph_chunks = chunk_by_paragraphs(text, max_chunk_size)
     
-    # If paragraphs are too small, combine them
-    if all(len(chunk) < min_chunk_size for chunk in paragraph_chunks) and len(paragraph_chunks) > 1:
-        return chunk_text_by_size(text, max_chunk_size, overlap=200)
+#     # If paragraphs are too small, combine them
+#     if all(len(chunk) < min_chunk_size for chunk in paragraph_chunks) and len(paragraph_chunks) > 1:
+#         return chunk_text_by_size(text, max_chunk_size, overlap=200)
     
-    # Check if any paragraph chunks are too large
-    final_chunks = []
-    for chunk in paragraph_chunks:
-        if len(chunk) > max_chunk_size:
-            # Split large paragraphs by sentences
-            sentence_chunks = chunk_by_sentences(chunk, max_chunk_size)
-            final_chunks.extend(sentence_chunks)
-        else:
-            final_chunks.append(chunk)
+#     # Check if any paragraph chunks are too large
+#     final_chunks = []
+#     for chunk in paragraph_chunks:
+#         if len(chunk) > max_chunk_size:
+#             # Split large paragraphs by sentences
+#             sentence_chunks = chunk_by_sentences(chunk, max_chunk_size)
+#             final_chunks.extend(sentence_chunks)
+#         else:
+#             final_chunks.append(chunk)
     
-    return final_chunks
+#     return final_chunks

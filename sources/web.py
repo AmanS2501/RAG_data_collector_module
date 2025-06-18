@@ -10,7 +10,6 @@ from urllib.parse import urljoin, urlparse
 from langchain_text_splitters import HTMLHeaderTextSplitter
 from RAG_data_collector_module.storage_utils import DocumentStorage
 
-
 load_dotenv()
 
 # url
@@ -19,10 +18,6 @@ BASE_URL = input("Enter the base URL to crawl (e.g., https://example.com): ").st
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
-
-VECTOR_DB_DIR = "vector_store"
-
-
 
 def clean_text(text: str) -> str:
     return ' '.join(text.split())
@@ -113,23 +108,6 @@ def crawl_website(start_url: str, max_pages: int = 100) -> list[Document]:
     return documents
 
 
-def store_in_vector_db(docs: list[Document], save_path: str):
-    if not docs:
-        print("[WARNING] No documents to store. Skipping vector DB creation.")
-        return
-        
-    print(f"[INFO] Embedding and saving {len(docs)} document chunks to vector DB...")
-
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
-    vectorstore = FAISS.from_documents(docs, embeddings)
-    vectorstore.save_local(save_path)
-
-    print(f"[SUCCESS] Vector store saved to: {save_path}")
-
-if __name__ == "__main__":
-    docs = crawl_website(BASE_URL)
-    print(f"[INFO] Crawled and chunked site into {len(docs)} documents.")
-
-    if docs:
-        store_in_vector_db(docs, VECTOR_DB_DIR)
+# if __name__ == "__main__":
+#     docs = crawl_website(BASE_URL)
+#     print(f"[INFO] Crawled and chunked site into {len(docs)} documents.")   This runs only when the script is executed directly
