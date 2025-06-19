@@ -12,6 +12,12 @@ from RAG_data_collector_module.storage_utils import DocumentStorage
 from langchain_core.documents import Document
 from typing import List
 
+def is_valid_text(text: str) -> bool:
+    try:
+        text.encode("utf-8").decode("utf-8")
+        return len(text.strip()) > 50
+    except UnicodeDecodeError:
+        return False
 
 def collect_file_documents() -> List[Document]:
     try:
