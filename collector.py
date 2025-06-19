@@ -1,10 +1,15 @@
+from urllib.parse import urljoin
 from RAG_data_collector_module.sources import load_file_documents
 from RAG_data_collector_module.sources import load_manual_documents
 from RAG_data_collector_module.sources import crawl_website
 from RAG_data_collector_module.utils import clean_text
 from RAG_data_collector_module.utils import chunk_document
 from RAG_data_collector_module.config import FILE_PATHS, MANUAL_INPUTS, BASE_URL, DEFAULT_CHUNK_SIZE, DEFAULT_OVERLAP
+from RAG_data_collector_module.utils import clean_web_content
 
+from RAG_data_collector_module.sources import fetch_robots_txt, fetch_security_txt
+from RAG_data_collector_module.storage_utils import DocumentStorage
+from langchain_core.documents import Document
 from langchain_core.documents import Document
 from typing import List
 
@@ -25,6 +30,7 @@ def collect_file_documents() -> List[Document]:
     except Exception as e:
         print(f"[ERROR] Failed to collect file documents: {e}")
         return []
+
 
 
 def collect_manual_documents() -> List[Document]:
@@ -62,18 +68,25 @@ def collect_web_documents() -> List[Document]:
     try:
         raw_docs = safe_crawl_website(BASE_URL)
         cleaned_docs = []
+
         for doc in raw_docs:
-            cleaned_text_content = clean_text(doc.page_content)
+            print("[INFO] Cleaning web document...")
+            cleaned_text_content = clean_web_content(doc.page_content)
+
             if cleaned_text_content:
+                print("[INFO] Cleaned web document...")
                 new_doc = Document(
                     page_content=cleaned_text_content,
                     metadata=doc.metadata.copy()
                 )
                 cleaned_docs.append(new_doc)
+
         return cleaned_docs
+
     except Exception as e:
         print(f"[ERROR] Failed to collect web documents: {e}")
         return []
+
 
 
 def chunk_documents(documents: List[Document], chunk_size: int = DEFAULT_CHUNK_SIZE, overlap: int = DEFAULT_OVERLAP) -> List[Document]:
@@ -100,8 +113,8 @@ def collect_all_documents(chunk: bool = True) -> List[Document]:
 
         web_docs = collect_web_documents()
         print(f"[INFO] Collected {len(web_docs)} web documents")
-
         all_docs = file_docs + manual_docs + web_docs
+
         print(f"[INFO] Total documents before chunking: {len(all_docs)}")
 
         if chunk and all_docs:

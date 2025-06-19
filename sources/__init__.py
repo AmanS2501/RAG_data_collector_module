@@ -12,7 +12,11 @@ try:
     from .web import crawl_website, BASE_URL, HEADERS
     from .manual import MANUAL_INPUTS
     from .files import DEFAULT_FILE_PATHS
-    
+    from . import robots  # ✅ NEW
+    from .robots import fetch_robots_txt, fetch_security_txt# ✅ NEW
+
+
+
     __all__ = [
         "files",
         "manual", 
@@ -21,7 +25,11 @@ try:
         "fetch_file_content",
         "load_manual_documents", 
         "add_manual_entry",
-        "crawl_website"
+        "crawl_website",
+        "robots",
+        "fetch_robots_txt",
+        "fetch_security_txt",
+        "robots"
     ]
     
     print("✓ Sources package loaded successfully")
