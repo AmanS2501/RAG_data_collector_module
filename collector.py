@@ -19,8 +19,10 @@ def collect_file_documents() -> List[Document]:
         raw_docs = load_file_documents(FILE_PATHS)
         cleaned_docs = []
         for doc in raw_docs:
+            print("[INFO] Cleaning file document...")
             cleaned_text = clean_text(doc.page_content)
             if cleaned_text:
+                print("[INFO] Cleaned file document...")
                 new_doc = Document(
                     page_content=cleaned_text,
                     metadata=doc.metadata.copy()
@@ -38,8 +40,10 @@ def collect_manual_documents() -> List[Document]:
         raw_docs = load_manual_documents(MANUAL_INPUTS)
         cleaned_docs = []
         for doc in raw_docs:
+            print("[INFO] Cleaning manual document...")
             cleaned_text_content = clean_text(doc.page_content)
             if cleaned_text_content:
+                print("[INFO] Cleaned manual document...")
                 new_doc = Document(
                     page_content=cleaned_text_content,
                     metadata=doc.metadata.copy()
@@ -106,13 +110,13 @@ def collect_all_documents(chunk: bool = True) -> List[Document]:
         print("[INFO] Starting document collection...")
 
         file_docs = collect_file_documents()
-        print(f"[INFO] Collected {len(file_docs)} file documents")
+        print(f"[INFO] Collected and Cleaned {len(file_docs)} file documents")
 
         manual_docs = collect_manual_documents()
-        print(f"[INFO] Collected {len(manual_docs)} manual documents")
+        print(f"[INFO] Collected and Cleaned {len(manual_docs)} manual documents")
 
         web_docs = collect_web_documents()
-        print(f"[INFO] Collected {len(web_docs)} web documents")
+        print(f"[INFO] Collected and Cleaned {len(web_docs)} web documents")
         all_docs = file_docs + manual_docs + web_docs
 
         print(f"[INFO] Total documents before chunking: {len(all_docs)}")

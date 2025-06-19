@@ -70,21 +70,40 @@ def clean_pdf_text(text: str) -> str:
     # Clean and normalize
     return clean_text(text)
 
+
 def clean_web_content(html_content: str) -> str:
-    # Clean content scraped from web pages.
+    """Cleans HTML content scraped from web pages."""
     if not html_content:
         return ""
-    
-    # First remove HTML tags
-    text = remove_html_tags(html_content)
-    
-    # Remove common web artifacts
-    text = re.sub(r'Cookie Policy|Privacy Policy|Terms of Service', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'©\s*\d{4}.*?All Rights Reserved', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'Subscribe|Newsletter|Follow us', '', text, flags=re.IGNORECASE)
-    
-    # Clean and normalize
-    return clean_text(text)
+
+    # 1. Remove inline <script>, <style>, and <noscript> tags
+    soup = BeautifulSoup(html_content, "html.parser")
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+
+    # 2. Extract visible text
+    text = soup.get_text(separator=" ")
+
+    # 3. Remove common web artifacts
+    text = re.sub(r"(Cookie Policy|Privacy Policy|Terms of Service)", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"©\s*\d{4}.*?All Rights Reserved", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"(Subscribe|Newsletter|Follow us)", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"Enquiry Form", "", text, flags=re.IGNORECASE)
+
+    # 4. Remove AJAX, JS fragments, JSON stubs
+    text = re.sub(r"ajax\s*\(.*?{.*?}.*?\)", "", text, flags=re.DOTALL)
+    text = re.sub(r"https?://[^\s)]+", "", text)
+    text = re.sub(r"[\{\}\[\]\(\)\<\>]", "", text)
+
+    # 5. Normalize whitespace and remove non-informative chunks
+    text = re.sub(r"\s+", " ", text).strip()
+
+    # 6. Skip storing garbage: short or script-heavy remnants
+    if len(text) < 50:
+        return ""
+
+    return text
+
 
 def remove_urls(text: str) -> str:
     # Remove URLs from text.
