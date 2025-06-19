@@ -10,7 +10,6 @@ from RAG_data_collector_module.utils import clean_web_content
 from RAG_data_collector_module.sources import fetch_robots_txt, fetch_security_txt
 from RAG_data_collector_module.storage_utils import DocumentStorage
 from langchain_core.documents import Document
-from langchain_core.documents import Document
 from typing import List
 
 
@@ -77,7 +76,7 @@ def collect_web_documents() -> List[Document]:
             print("[INFO] Cleaning web document...")
             cleaned_text_content = clean_web_content(doc.page_content)
 
-            if cleaned_text_content:
+            if is_valid_text(cleaned_text_content):
                 print("[INFO] Cleaned web document...")
                 new_doc = Document(
                     page_content=cleaned_text_content,
@@ -90,7 +89,6 @@ def collect_web_documents() -> List[Document]:
     except Exception as e:
         print(f"[ERROR] Failed to collect web documents: {e}")
         return []
-
 
 
 def chunk_documents(documents: List[Document], chunk_size: int = DEFAULT_CHUNK_SIZE, overlap: int = DEFAULT_OVERLAP) -> List[Document]:

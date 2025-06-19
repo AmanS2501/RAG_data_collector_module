@@ -30,7 +30,7 @@ try:
         "fetch_robots_txt",
         "fetch_security_txt",
         "robots"
-    ]
+        ]
     
     print("✓ Sources package loaded successfully")
     
