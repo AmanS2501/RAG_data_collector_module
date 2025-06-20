@@ -36,6 +36,7 @@ def main():
         else:
             print("[ERROR] Failed to store some documents")
         
+        
         # Show storage statistics
         print("\n" + "="*40)
         print("STORAGE STATISTICS")

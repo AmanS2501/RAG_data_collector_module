@@ -5,7 +5,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from dotenv import load_dotenv
 from langchain_core.documents import Document
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 
 load_dotenv()
@@ -17,24 +17,24 @@ METADATA_FILE = "metadata.json"
 
 class DocumentStorage:
     # Handles storage operations for documents and metadata.
-    
+
     def __init__(self, storage_dir: str = STORAGE_DIR):
         self.storage_dir = Path(storage_dir)
         self.vector_db_dir = Path(VECTOR_DB_DIR)
         self.metadata_file = self.storage_dir / METADATA_FILE
         self._ensure_directories()
-    
+
     def _ensure_directories(self):
         # Create storage directories if they don't exist.
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.vector_db_dir.mkdir(parents=True, exist_ok=True)
         print(f"[INFO] Storage directories ensured: {self.storage_dir}, {self.vector_db_dir}")
-    
+
     def save_documents_as_json(self, documents: List[Document], filename: str = "documents.json", append: bool = False) -> bool:
         # Save documents as JSON file.
         try:
             file_path = self.storage_dir / filename
-            
+
             new_doc_data = [
                 {
                     "page_content": doc.page_content,
@@ -42,7 +42,7 @@ class DocumentStorage:
                     "saved_at": datetime.now().isoformat()
                 } for doc in documents
             ]
-            
+
             if append and file_path.exists():
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
@@ -52,16 +52,16 @@ class DocumentStorage:
                     existing_data = []
             else:
                 existing_data = []
-            
+
             # Combine existing + new
             all_data = existing_data + new_doc_data
 
             # Save to JSON
             with open(file_path, 'w', encoding='utf-8') as f:
-               json.dump(all_data, f, indent=2, ensure_ascii=False)
+                json.dump(all_data, f, indent=2, ensure_ascii=False)
 
             print(f"[SUCCESS] Saved {len(documents)} documents to: {file_path}")
-            
+
             # Update metadata
             self._update_metadata({
                 "type": "json_save",
@@ -70,25 +70,25 @@ class DocumentStorage:
                 "saved_at": datetime.now().isoformat(),
                 "file_path": str(file_path)
             })
-            
+
             return True
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to save documents as JSON: {e}")
             return False
-    
+
     def load_documents_from_json(self, filename: str = "documents.json") -> List[Document]:
         # Load documents from JSON file.
         try:
             file_path = self.storage_dir / filename
-            
+
             if not file_path.exists():
                 print(f"[ERROR] JSON file not found: {file_path}")
                 return []
-            
+
             with open(file_path, 'r', encoding='utf-8') as f:
                 doc_data = json.load(f)
-            
+
             # Convert back to Document objects
             documents = []
             for doc_dict in doc_data:
@@ -97,24 +97,24 @@ class DocumentStorage:
                     metadata=doc_dict.get("metadata", {})
                 )
                 documents.append(doc)
-            
+
             print(f"[SUCCESS] Loaded {len(documents)} documents from: {file_path}")
             return documents
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to load documents from JSON: {e}")
             return []
-    
+
     def save_raw_text(self, text: str, filename: str, source_info: Dict[str, Any] = None) -> bool:
         # Save raw text content to file.
         try:
             file_path = self.storage_dir / filename
-            
+
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(text)
-            
+
             print(f"[SUCCESS] Saved raw text to: {file_path}")
-            
+
             # Update metadata
             metadata = {
                 "type": "raw_text",
@@ -123,35 +123,34 @@ class DocumentStorage:
                 "saved_at": datetime.now().isoformat(),
                 "file_path": str(file_path)
             }
-            
+
             if source_info:
                 metadata.update(source_info)
-            
+
             self._update_metadata(metadata)
-            
+
             return True
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to save raw text: {e}")
             return False
-    
+
     def store_in_vector_db(self, documents: List[Document], save_path: str = None) -> bool:
-        # Store documents in FAISS vector database.
+        # Store documents in Chroma vector database.
         try:
             if not documents:
                 print("[WARNING] No documents to store. Skipping vector DB creation.")
                 return False
-            
+
             save_path = save_path or str(self.vector_db_dir)
-            
+
             print(f"[INFO] Embedding and saving {len(documents)} documents to vector DB...")
-            
+
             embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-            vectorstore = FAISS.from_documents(documents, embeddings)
-            vectorstore.save_local(save_path)
-            
+            vectorstore = Chroma.from_documents(documents, embeddings, persist_directory=save_path)
+
             print(f"[SUCCESS] Vector store saved to: {save_path}")
-            
+
             # Update metadata
             self._update_metadata({
                 "type": "vector_db",
@@ -160,61 +159,61 @@ class DocumentStorage:
                 "vector_db_path": save_path,
                 "embedding_model": "sentence-transformers/all-MiniLM-L6-v2"
             })
-            
+
             return True
 
         except Exception as e:
             print(f"[ERROR] Failed to store in vector DB: {e}")
             return False
-    
-    def load_vector_db(self, load_path: str = None) -> Optional[FAISS]:
-        # Load FAISS vector database.
+
+    def load_vector_db(self, load_path: str = None) -> Optional[Chroma]:
+        # Load Chroma vector database.
         try:
             load_path = load_path or str(self.vector_db_dir)
-            
+
             if not Path(load_path).exists():
                 print(f"[ERROR] Vector DB path not found: {load_path}")
                 return None
-            
+
             embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-            vectorstore = FAISS.load_local(load_path, embeddings, allow_dangerous_deserialization=True)
-            
+            vectorstore = Chroma(persist_directory=load_path, embedding_function=embeddings)
+
             print(f"[SUCCESS] Loaded vector DB from: {load_path}")
             return vectorstore
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to load vector DB: {e}")
             return None
-    
+
     def save_processing_log(self, log_data: Dict[str, Any], log_filename: str = "processing_log.json") -> bool:
         # Save processing log with URLs/files processed.
         try:
             log_path = self.storage_dir / log_filename
-            
+
             # Load existing log if it exists
             existing_logs = []
             if log_path.exists():
                 with open(log_path, 'r', encoding='utf-8') as f:
                     existing_logs = json.load(f)
-            
+
             # Add new log entry
             log_entry = {
                 "timestamp": datetime.now().isoformat(),
                 **log_data
             }
             existing_logs.append(log_entry)
-            
+
             # Save updated log
             with open(log_path, 'w', encoding='utf-8') as f:
                 json.dump(existing_logs, f, indent=2, ensure_ascii=False)
-            
+
             print(f"[SUCCESS] Processing log saved to: {log_path}")
             return True
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to save processing log: {e}")
             return False
-    
+
     def _update_metadata(self, metadata: Dict[str, Any]):
         # Update metadata file with operation information.
         try:
@@ -223,17 +222,17 @@ class DocumentStorage:
             if self.metadata_file.exists():
                 with open(self.metadata_file, 'r', encoding='utf-8') as f:
                     existing_metadata = json.load(f)
-            
+
             # Add new metadata entry
             existing_metadata.append(metadata)
-            
+
             # Save updated metadata
             with open(self.metadata_file, 'w', encoding='utf-8') as f:
                 json.dump(existing_metadata, f, indent=2, ensure_ascii=False)
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to update metadata: {e}")
-    
+
     def get_storage_stats(self) -> Dict[str, Any]:
         # Get storage statistics.
         try:
@@ -246,14 +245,14 @@ class DocumentStorage:
                 "metadata_entries": 0,
                 "last_updated": None
             }
-            
+
             # Count files and calculate size
             if self.storage_dir.exists():
                 for file_path in self.storage_dir.rglob('*'):
                     if file_path.is_file():
                         stats["files_in_storage"] += 1
                         stats["total_storage_size"] += file_path.stat().st_size
-            
+
             # Get metadata info
             if self.metadata_file.exists():
                 with open(self.metadata_file, 'r', encoding='utf-8') as f:
@@ -261,9 +260,9 @@ class DocumentStorage:
                     stats["metadata_entries"] = len(metadata)
                     if metadata:
                         stats["last_updated"] = metadata[-1].get("saved_at")
-            
+
             return stats
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to get storage stats: {e}")
             return {}
@@ -274,17 +273,17 @@ class DocumentStorage:
             from datetime import timedelta
             cutoff_date = datetime.now() - timedelta(days=days_old)
             removed_count = 0
-            
+
             for file_path in self.storage_dir.rglob('*'):
                 if file_path.is_file():
                     file_modified = datetime.fromtimestamp(file_path.stat().st_mtime)
                     if file_modified < cutoff_date:
                         file_path.unlink()
                         removed_count += 1
-            
+
             print(f"[SUCCESS] Cleaned up {removed_count} old files")
             return True
-            
+
         except Exception as e:
             print(f"[ERROR] Failed to cleanup old files: {e}")
             return False
@@ -292,21 +291,21 @@ class DocumentStorage:
 def store_documents(documents: List[Document], storage_format: str = "both") -> bool:
     # Convenience function to store documents.
     storage = DocumentStorage()
-    
+
     success = True
-    
+
     if storage_format in ["json", "both"]:
         success &= storage.save_documents_as_json(documents)
-    
+
     if storage_format in ["vector", "both"]:
         success &= storage.store_in_vector_db(documents)
-    
+
     return success
 
 def load_stored_documents(source: str = "json") -> List[Document]:
     # Convenience function to load stored documents.
     storage = DocumentStorage()
-    
+
     if source == "json":
         return storage.load_documents_from_json()
     else:
