@@ -126,7 +126,7 @@ def collect_all_documents(chunk: bool = True) -> List[Document]:
         print(f"[INFO] Total documents before chunking: {len(all_docs)}")
 
         if chunk and all_docs:
-            all_docs = chunk_documents(all_docs, )
+            all_docs = chunk_documents(all_docs)
             print(f"[INFO] Total documents after chunking: {len(all_docs)}")
 
         return all_docs

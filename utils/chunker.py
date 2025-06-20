@@ -130,7 +130,7 @@ def chunk_by_paragraphs(text: str, max_chunk_size: int = 1000) -> List[str]:
     
     return chunks
 
-def chunk_document(document: Document, chunk_size: int = 1000, overlap: int = 200, method: str = "size") -> List[Document]:
+def chunk_document(document: Document, chunk_size: int = 500, overlap: int = 100, method: str = "size") -> List[Document]:
     # Chunk a document into smaller documents using specified method.
     if not document or not document.page_content:
         return []
