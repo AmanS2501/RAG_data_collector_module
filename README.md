@@ -41,19 +41,35 @@ Collects, cleans, chunks, and vectorizes unstructured content from PDFs, text fi
 ## 📁 Project Structure
 
 RAG_data_collector_module/
+
 ├── main.py # CLI runner
+
 ├── init.py # Package bootstrap
+
 ├── collector.py # Document collection logic
+
 ├── config.py # Central config
+
 ├── storage.py # JSON & FAISS storage
+
 ├── sources/ # Ingestion modules
+
 │ ├── files.py # PDF, text file input
+
+│ ├── robots.py 
+
 │ ├── manual.py # Hardcoded content
+
 │ └── web.py # Web scraping
+
 ├── utils/ # Preprocessing
+
 │ ├── cleaner.py # Cleaning rules
+
 │ └── chunker.py # Chunking strategies
+
 └── vector_store/ # Output vector DB
+
 
 
 ---
