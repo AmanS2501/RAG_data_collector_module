@@ -64,11 +64,12 @@ RAG_data_collector_module/
 
 ```bash
 git clone https://github.com/AmanS2501/RAG_data_collector_module.git
-cd RAG_data_collector_module
+cd RAG_data_collector_module (You have run this as a package from root folder)
 
 conda create -n chatbotenv python=3.10
 conda activate chatbotenv
 pip install -r requirements.txt
+cd ..
 
 python -m RAG_data_collector_module
 
