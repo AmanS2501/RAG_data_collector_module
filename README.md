@@ -41,19 +41,35 @@ Collects, cleans, chunks, and vectorizes unstructured content from PDFs, text fi
 ## 📁 Project Structure
 
 RAG_data_collector_module/
+
 ├── main.py # CLI runner
+
 ├── init.py # Package bootstrap
+
 ├── collector.py # Document collection logic
+
 ├── config.py # Central config
+
 ├── storage.py # JSON & FAISS storage
+
 ├── sources/ # Ingestion modules
+
 │ ├── files.py # PDF, text file input
+
+│ ├── robots.py 
+
 │ ├── manual.py # Hardcoded content
+
 │ └── web.py # Web scraping
+
 ├── utils/ # Preprocessing
+
 │ ├── cleaner.py # Cleaning rules
+
 │ └── chunker.py # Chunking strategies
+
 └── vector_store/ # Output vector DB
+
 
 
 ---
@@ -64,11 +80,12 @@ RAG_data_collector_module/
 
 ```bash
 git clone https://github.com/AmanS2501/RAG_data_collector_module.git
-cd RAG_data_collector_module
+cd RAG_data_collector_module (You have run this as a package from root folder)
 
 conda create -n chatbotenv python=3.10
 conda activate chatbotenv
 pip install -r requirements.txt
+cd ..
 
 python -m RAG_data_collector_module
 
