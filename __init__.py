@@ -102,11 +102,11 @@ __all__ = [
 print(f"RAG Data Collector Module v{__version__} initialized successfully!")
 print(f"Available modules: {', '.join(available_modules) if available_modules else 'None'}")
 
-# if __name__ == "__main__":
-#     print("="*50)
-#     print("RAG DATA COLLECTOR MODULE")
-#     print("="*50)
-#     print(f"Version: {__version__}")
-#     print(f"Available modules: {len(available_modules)}")
+if __name__ == "__main__":
+    print("="*50)
+    print("RAG DATA COLLECTOR MODULE")
+    print("="*50)
+    print(f"Version: {__version__}")
+    print(f"Available modules: {len(available_modules)}")
 
-#     print(f"\nTest function result: {hello()}") #runs only if executed directly
+    print(f"\nTest function result: {hello()}") #runs only if executed directly

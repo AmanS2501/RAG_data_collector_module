@@ -1,0 +1,17 @@
+# Core dependencies
+requests>=2.25.1
+beautifulsoup4>=4.9.3
+python-dotenv>=0.21.0
+PyPDF2>=3.0.1
+langchain-core>=0.1.43
+langchain-community>=0.0.34
+langchain-huggingface>=0.0.8
+langchain-text-splitters>=0.0.1
+sentence-transformers>=2.2.2
+chromadb>=0.4.24
+
+# Optional: For safety with FAISS, if you switch from Chroma to FAISS
+faiss-cpu>=1.7.4
+
+# Other utils (standard)
+tqdm>=4.65.0
