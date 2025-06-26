@@ -54,6 +54,10 @@ RAG_data_collector_module/
 
 ├── sources/ # Ingestion modules
 
+│ ├── RG_LLM_Integration.ipynb # llama, LoRA finetuning
+
+├── sources/ # Ingestion modules
+
 │ ├── files.py # PDF, text file input
 
 │ ├── robots.py 
