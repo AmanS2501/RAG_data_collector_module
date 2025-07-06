@@ -25,8 +25,37 @@ def is_file_url(url: str) -> bool:
     path = urlparse(url).path
     return any(path.lower().endswith(ext) for ext in FILE_EXTENSIONS)
 
-def clean_text(text: str) -> str:
-    return ' '.join(text.split())
+from bs4 import BeautifulSoup
+import re
+
+def clean_text(raw_html: str) -> str:
+    """Clean HTML by removing scripts/styles/tags and normalizing whitespace."""
+    try:
+        soup = BeautifulSoup(raw_html, "html.parser")
+
+        # Remove script and style elements
+        for tag in soup(["script", "style"]):
+            tag.decompose()
+
+        # Remove noscript, nav, and footer if needed
+        for tag in soup(["noscript", "nav", "footer"]):
+            tag.decompose()
+
+        # Extract visible text
+        text = soup.get_text(separator=' ')
+
+        # Remove long JavaScript or jQuery fragments manually if leaked
+        text = re.sub(r"document\.write\([^\)]*\)", "", text)
+        text = re.sub(r"window\.jQuery[^\n]*", "", text)
+
+        # Normalize whitespace
+        text = re.sub(r'\s+', ' ', text)
+
+        return text.strip()
+    except Exception as e:
+        print(f"[WARN] Failed to clean HTML: {e}")
+        return raw_html
+
 
 def crawl_website(start_url: str, max_pages: int = 100) -> list[Document]:
     from time import sleep
